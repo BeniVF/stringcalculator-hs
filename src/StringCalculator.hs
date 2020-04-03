@@ -1,4 +1,4 @@
-module Data.String.Strip (strip)  where
+module StringCalculator (strip)  where
 
 import Data.Char
 

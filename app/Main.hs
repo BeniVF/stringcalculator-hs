@@ -1,6 +1,6 @@
 module Main where
 
-import Data.String.Strip
+import StringCalculator
 
 main :: IO ()
 main = interact strip

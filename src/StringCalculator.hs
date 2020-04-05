@@ -6,7 +6,7 @@ import           Control.Applicative
 add :: String -> Maybe Int
 add = (>>= calculate) . runParser stringCalculatorParser
   where
-    calculate(x,y) = if null x then Just $ sum y else Nothing
+    calculate(x,y) = if null x then Just $ sum $ filter(<=1000) y else Nothing
 
 stringCalculatorParser :: Parser [Int]
 stringCalculatorParser = [] <$ emptyInputP <|>

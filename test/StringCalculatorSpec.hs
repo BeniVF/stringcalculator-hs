@@ -27,6 +27,10 @@ spec = do
       add "1\n2,3" `shouldBe` Just 6
     it "when input is `6,0\n10`" $
       add "6,0\n10" `shouldBe` Just 16
+    it "when input when there are not new delimiters" $
+      add "//\n1,2" `shouldBe` Just 3
+    it "when input include one new delimiter" $
+      add "//;\n1;2" `shouldBe` Just 3
   describe "StringCalculator should not able to calculate" $ do
     it "when input is `ddd`" $
       add "ddd" `shouldBe` Nothing
@@ -36,4 +40,8 @@ spec = do
       add ",1,2,3" `shouldBe` Nothing
     it "when input is `1,\n`" $
       add "1,\n" `shouldBe` Nothing
+    it "when input is `/\n1`" $
+      add "/\n1" `shouldBe` Nothing
+    it "when input is `//;[]\n1;2[3]5`" $
+      add "//;[]\n1;2[3]5" `shouldBe` Nothing
 

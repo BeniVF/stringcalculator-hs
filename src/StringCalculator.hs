@@ -20,7 +20,12 @@ newSepP :: String -> Parser Char
 newSepP sep = oneOfP sep defaultSepP charP
 
 delimitersP :: Parser String
-delimitersP = (:[]) <$> (slashP *> slashP *> ((ifP (const True) <* endOfLineP) <|> endOfLineP))
+delimitersP =  slashP *> slashP *> 
+                  (
+                    [] <$ endOfLineP <|>
+                    (:[]) <$> ifP (const True) <* endOfLineP <|>
+                    many(charP '[' *> ifP (const True) <* charP ']') <* endOfLineP
+                  )
 
 intsP :: Parser Char -> Parser [Int]
 intsP sep = (:) <$> intP <*> sepBy sep intP

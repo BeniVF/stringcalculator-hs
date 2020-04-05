@@ -35,6 +35,8 @@ spec = do
       add "2,1000" `shouldBe` Just 1002
     it "when number bigger that 1000 and these ones should be ignored" $
       add "2,1001,1002" `shouldBe` Just 2
+    it "when input include multiple new delimiter" $
+      add "//[;][.]\n2;0.3.10" `shouldBe` Just 15
   describe "StringCalculator should not able to calculate" $ do
     it "when input is `ddd`" $
       add "ddd" `shouldBe` Nothing

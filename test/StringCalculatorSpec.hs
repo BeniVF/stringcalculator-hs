@@ -37,6 +37,10 @@ spec = do
       add "2,1001,1002" `shouldBe` Just 2
     it "when input include multiple new delimiter" $
       add "//[;][.]\n2;0.3.10" `shouldBe` Just 15
+    it "when input include new delimiter using `[]` syntax" $
+      add "//[***]\n2***10" `shouldBe` Just 12
+    it "when input include multiple new delimiter using `[]` syntax" $
+      add "//[***][...]\n2***10...20" `shouldBe` Just 32
   describe "StringCalculator should not able to calculate" $ do
     it "when input is `ddd`" $
       add "ddd" `shouldBe` Nothing
@@ -48,8 +52,14 @@ spec = do
       add "1,\n" `shouldBe` Nothing
     it "when input is `/\n1`" $
       add "/\n1" `shouldBe` Nothing
+    it "when input is `//;.\n1;2.3;5`" $
+      add "//;.\n1;2.3;5" `shouldBe` Nothing
     it "when input is `//;[]\n1;2[3]5`" $
       add "//;[]\n1;2[3]5" `shouldBe` Nothing
+    it "when input is `//][\n1;2[3]5`" $
+      add "//][\n1;2[3]5" `shouldBe` Nothing
+    it "when input is `//[[]\n1;2[35`" $
+      add "//[[]\n1;2[35" `shouldBe` Nothing
     it "when input is `-100`" $
       add "-100" `shouldBe` Nothing -- FIXME change to proper message `negatives not allowed`
 

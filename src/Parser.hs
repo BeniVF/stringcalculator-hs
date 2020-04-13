@@ -22,6 +22,30 @@ instance Alternative Parser where
   (Parser p1) <|> (Parser p2) = Parser $
     \x -> p1 x <|> p2 x
 
+stringCalculatorParser :: Parser [Int]
+stringCalculatorParser = [] <$ emptyInputP <|>
+                          intsP defaultSepP <|>
+                          andThenP delimitersP (intsP . newSepP)
+
+delimitersP :: Parser [String]
+delimitersP =  slashP *> slashP *> 
+                  (
+                    ((\x -> [[x]]) <$> ifP (/= '\n') <* endOfLineP) <|>
+                    many (openSquareBracketP *> many(ifP (/= ']')) <* closeSquareBracketP) <* endOfLineP
+                  )
+
+defaultSepP :: Parser String
+defaultSepP = (:[]) <$> (commaP <|> endOfLineP)
+
+newSepP :: [String] -> Parser String
+newSepP = oneOfP defaultSepP literalP
+
+literalP :: String -> Parser String
+literalP l = Parser $ \s -> runParser (traverse charP l) s
+
+intsP :: Parser String -> Parser [Int]
+intsP sep = (:) <$> intP <*> sepBy sep intP
+
 andThenP :: Parser a -> (a -> Parser [b]) -> Parser [b]
 andThenP p f = Parser $ \x ->
     do 
@@ -31,11 +55,17 @@ andThenP p f = Parser $ \x ->
 slashP :: Parser Char
 slashP = charP '/'
 
+openSquareBracketP :: Parser Char
+openSquareBracketP = charP '['
+
+closeSquareBracketP :: Parser Char
+closeSquareBracketP = charP ']'
+
 emptyInputP :: Parser ()
 emptyInputP = Parser $ \x -> if null x then Just("", ()) else Nothing
 
 intP :: Parser Int
-intP = (\x y -> read $ x : y) <$> digitP <*> spanP isDigit
+intP = (\x y -> read $ x : y) <$> digitP <*> spanP isDigit --TODO Maybe it cannot be converted
 
 digitP :: Parser Char
 digitP = ifP isDigit
@@ -66,6 +96,6 @@ charP c = Parser f
              | otherwise = Nothing
     f _ = Nothing
 
-oneOfP :: [a] -> Parser a -> (a -> Parser a) -> Parser a
-oneOfP (x:xs) d f = f x <|> oneOfP xs d f
-oneOfP _ d _ = d
+oneOfP :: Parser a -> (a -> Parser a) -> [a] -> Parser a
+oneOfP d f (x:xs)= f x <|> oneOfP d f xs
+oneOfP d _ _ = d
